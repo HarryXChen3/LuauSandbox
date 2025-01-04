@@ -1,132 +1,179 @@
 type Map<K, V> = {[K]: V}
 
-type Unit = {
+export type Unit = number
+export type UnitData = {
+    pos: Unit,
+
     prefix: string,
     base: number,
     to_larger: number,
     to_smaller: number,
-    order: number
 }
 
-type Units = Map<number, Unit>
+export type Units = Map<Unit, UnitData>
 
-local _UNITS: Units = {
+local UNITS: Units = {
     [4] = {
+        pos = 4,
+
         prefix = "T",
         base = 1e+12,
         to_larger = 1e+12 + 1e+4,
-        to_smaller = 1e+12 - 1e+2,
-        order = 4
+        to_smaller = 1e+12 - 1e+2
     },
     [3] = {
+        pos = 3,
+        
         prefix = "G",
         base = 1e+9,
         to_larger = 1e+9 + 1e+3,
-        to_smaller = 1e+9 - 1e+3,
-        order = 3
+        to_smaller = 1e+9 - 1e+3
     },
     [2] = {
+        pos = 2,
+
         prefix = "M",
         base = 1e+6,
         to_larger = 1e+6 + 1e+2,
-        to_smaller = 1e+6 - 1e+2,
-        order = 2
+        to_smaller = 1e+6 - 1e+2
     },
     [1] = {
+        pos = 1,
+
         prefix = "k",
         base = 1000,
         to_larger = 1200,
-        to_smaller = 980,
-        order = 1
+        to_smaller = 980
     },
     [0] = {
+        pos = 0,
+
         prefix = "",
         base = 1,
         to_larger = 1.2,
-        to_smaller = 0.98,
-        order = 0
+        to_smaller = 0.98
     },
     [-1] = {
+        pos = -1,
+
         prefix = "m",
         base = 0.001,
         to_larger = 0.0012,
-        to_smaller = 0.0098,
-        order = -1
+        to_smaller = 0.0098
     },
     [-2] = {
+        pos = -2,
+
         prefix = "u",
         base = 1e-6,
         to_larger = 1e-6 + 1e-2,
-        to_smaller = 1e-6 - 1e-2,
-        order = -2
+        to_smaller = 1e-6 - 1e-2
     },
     [-3] = {
+        pos = -3,
+
         prefix = "n",
         base = 1e-9,
         to_larger = 1e-9 + 1e-3,
         to_smaller = 1e-9 - 1e-3,
-        order = -3
+        unit = -3
     },
     [-4] = {
+        pos = -4,
+
         prefix = "p",
         base = 1e-12,
         to_larger = 1e-12 + 1e-4,
-        to_smaller = 1e-12 - 1e-4,
-        order = -4
+        to_smaller = 1e-12 - 1e-4
     }
 }
 
-local function convert_units(value: number, unit: string): (number, string)
+local function convert_units(value: number, base: string): (number, string, Unit)
     local sgn = math.sign(value)
     local abs_value = math.abs(value)
 
-    local order = 0
-    while abs_value >= 1000 and _UNITS[order + 1] do
-        order += 1
-        abs_value /= 1000
+    local pos = 0
+    local unit = UNITS[pos]
+    local min_value = unit.base
+    while abs_value >= min_value and unit do
+        local next_pos = pos + 1
+        local next_unit = UNITS[next_pos]
+        if not next_unit then
+            break
+        end
+
+        pos = next_pos
+        abs_value /= (next_unit.base / unit.base)
+        unit = next_unit
     end
 
-    while abs_value ~= 0 and abs_value < 1 and _UNITS[order - 1] do
-        order -= 1
-        abs_value *= 1000
+    while abs_value ~= 0 and abs_value < 1 and unit do
+        local next_pos = pos - 1
+        local next_unit = UNITS[next_pos]
+        if not next_unit then
+            break
+        end
+
+        pos = next_pos
+        abs_value *= (unit.base / next_unit.base)
+        unit = next_unit
     end
 
-    return sgn * abs_value, _UNITS[order].prefix .. unit
+    return sgn * abs_value, unit.prefix .. base, pos
 end
 
-local function convert_units_with_differing_edges(value: number, base: string, prev: number?): (number, string, number)
+local function convert_units_with_differing_edges(value: number, base: string, prev: number?): (number, string, Unit)
     local sgn = math.sign(value)
     local abs_value = math.abs(value)
 
-    local order = 0
-    while abs_value >= 1000 and _UNITS[order + 1] do
-        order += 1
-        abs_value /= 1000
+    local pos = 0
+    local unit = UNITS[pos]
+    local min_value = unit.base
+    while abs_value >= min_value and unit do
+        local next_pos = pos + 1
+        local next_unit = UNITS[next_pos]
+        if not next_unit then
+            break
+        end
+
+        pos = next_pos
+        abs_value /= (next_unit.base / unit.base)
+        unit = next_unit
     end
 
-    while abs_value ~= 0 and abs_value < 1 and _UNITS[order - 1] do
-        order -= 1
-        abs_value *= 1000
+    while abs_value ~= 0 and abs_value < 1 and unit do
+        local next_pos = pos - 1
+        local next_unit = UNITS[next_pos]
+        if not next_unit then
+            break
+        end
+
+        pos = next_pos
+        abs_value *= (unit.base / next_unit.base)
+        unit = next_unit
     end
-    
-    local unit = _UNITS[order]
 
     if prev then
-        local prev_unit = _UNITS[prev]
-        local diff = prev_unit.order - unit.order
-        if diff == 1 and value >= prev_unit.to_smaller and _UNITS[order + 1] then
-            abs_value /= 1000
-            order += 1
-        elseif diff == -1 and value <= unit.to_larger and _UNITS[order - 1] then
-            abs_value *= 1000
-            order -= 1
+        local prev_unit = UNITS[prev]
+        local diff = prev_unit.pos - unit.pos
+        
+        if diff == 1 and value >= prev_unit.to_smaller then
+            pos += 1
+            abs_value /= (prev_unit.base / unit.base)
+            unit = prev_unit
+        elseif diff == -1 and value <= unit.to_larger then
+            pos -= 1
+            abs_value *= (unit.base / prev_unit.base)
+            unit = prev_unit
         end
     end
 
-    return sgn * abs_value, _UNITS[order].prefix .. base, order
+    return sgn * abs_value, unit.prefix .. base, pos
 end
 
 return table.freeze({
+    UNITS = UNITS,
+
     convert_units = convert_units,
     convert_units_with_differing_edges = convert_units_with_differing_edges
 })
