@@ -19,7 +19,7 @@ local UNITS: Units = {
         prefix = "T",
         base = 1e+12,
         to_larger = 1e+12 + 1e+4,
-        to_smaller = 1e+12 - 1e+2
+        to_smaller = 1e+12 - 1e+4
     },
     [3] = {
         pos = 3,
@@ -59,32 +59,31 @@ local UNITS: Units = {
         prefix = "m",
         base = 0.001,
         to_larger = 0.0012,
-        to_smaller = 0.0098
+        to_smaller = 0.0008
     },
     [-2] = {
         pos = -2,
 
         prefix = "u",
         base = 1e-6,
-        to_larger = 1e-6 + 1e-2,
-        to_smaller = 1e-6 - 1e-2
+        to_larger = 1e-6 + 2e-7,
+        to_smaller = 1e-6 - 4e-7
     },
     [-3] = {
         pos = -3,
 
         prefix = "n",
         base = 1e-9,
-        to_larger = 1e-9 + 1e-3,
-        to_smaller = 1e-9 - 1e-3,
-        unit = -3
+        to_larger = 1e-9 + 2e-10,
+        to_smaller = 1e-9 - 6e-10
     },
     [-4] = {
         pos = -4,
 
         prefix = "p",
         base = 1e-12,
-        to_larger = 1e-12 + 1e-4,
-        to_smaller = 1e-12 - 1e-4
+        to_larger = 1e-12 + 2e-13,
+        to_smaller = 1e-12 - 8e-13
     }
 }
 
