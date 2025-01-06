@@ -253,6 +253,6 @@ do
 end
 
 local success = FINISH()
-if not success then error(nil, 0) end
-
-return nil
+return function()
+    if not success then error(nil, 0) end
+end
