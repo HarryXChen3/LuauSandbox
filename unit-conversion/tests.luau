@@ -226,7 +226,6 @@ do
 
             n, dis, unit = units.convert_units_with_differing_edges(V1, UNIT, unit)
 
-            print(n, V1, unit)
             CHECK(n == V1)
             CHECK(dis == "m")
             CHECK(unit == 0)
