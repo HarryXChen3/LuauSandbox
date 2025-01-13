@@ -5,13 +5,12 @@ local circularbuffer = require("./../../datastructures/circularbuffer/circularbu
 type Map<K, V> = {[K]: V}
 type Array<T> = {[number]: T}
 
-type CircularQueue = circularbuffer.CircularBuffer<number>
 export type MovingAverage = {
     _average: number,
     _samples: number,
     _n: number,
     _initial_sum: number,
-    _window: CircularQueue,
+    _window: circularbuffer.CircularBuffer<number>,
 
     compute: (self: MovingAverage, n: number?) -> number,
 }
