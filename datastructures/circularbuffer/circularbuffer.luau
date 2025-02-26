@@ -57,14 +57,18 @@ local function clear<T>(self: CircularBuffer<T>)
 end
 
 local function iter<T>(self: CircularBuffer<T>): () -> (number, T)
-    local arr = self.buf
-    local tail = if self.tail - 1 <= 0 then self.capacity + 1 else self.tail
+    local size = self.size
+    local capacity = self.capacity
+    local tail = self.tail
+    local buf = self.buf
+
     local i = self.head - 1
+    local n = if size == capacity and tail - 1 <= 0 then capacity + 1 else tail
     return function()
         i += 1
 
-        if i < tail then
-            return i, arr[i]
+        if i < n then
+            return i, buf[i]
         else
             return nil :: any, nil :: any
         end

@@ -59,13 +59,17 @@ local function clear<T>(self: CircularBuffer_f64)
 end
 
 local function iter(self: CircularBuffer_f64): () -> (number, number)
+    local size = self.size
+    local capacity = self.capacity
+    local tail = self.tail
     local buf = self.buf
-    local tail = if self.tail <= 0 then self.capacity else self.tail
+    
     local i = self.head - 1
+    local n = if size == capacity and tail <= 0 then capacity else tail
     return function()
         i += 1
 
-        if i < tail then
+        if i < n then
             return i, buffer.readf64(buf, i * FLOAT64_SIZE)
         else
             return nil :: any, nil :: any

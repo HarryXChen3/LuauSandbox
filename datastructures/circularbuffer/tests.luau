@@ -292,6 +292,18 @@ do
     end)
 
     TEST("circularbuffer:iter()", function()
+        do CASE "add 0, iter"
+            local N = 0
+            local CAPACITY = 10
+            local c = circularbuffer(CAPACITY)
+
+            local expect = 0
+            for i, n in c:iter() do
+                expect += 1
+            end
+            CHECK(expect == N)
+        end
+
         do CASE "add n < capacity, iter"
             local N = 5
             local CAPACITY = 10
@@ -584,6 +596,18 @@ do
     end)
 
     TEST("circularbuffer_f64:iter()", function()
+        do CASE "add 0, iter"
+            local N = 0
+            local CAPACITY = 10
+            local c = circularbuffer_f64(CAPACITY)
+
+            local expect = 0
+            for i, n in c:iter() do
+                expect += 1
+            end
+            CHECK(expect == N)
+        end
+
         do CASE "add n < capacity, iter"
             local N = 5
             local CAPACITY = 10
